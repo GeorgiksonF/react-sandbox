@@ -1,0 +1,19 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.header > *:not(:last-child) {
+    margin-right: 8px;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+}
+
+.filters > *:not(:last-child) {
+    margin-right: 8px;
+}

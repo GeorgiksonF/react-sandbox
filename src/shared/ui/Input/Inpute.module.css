@@ -1,0 +1,20 @@
+.inputWrapper {
+    display: flex;
+    border: 2px solid var(--input-primary);
+    padding: 0px 4px;
+    border-radius: var(--border-radius-s);
+    cursor: pointer;
+    height: 24px;
+    width: 100%;
+}
+
+.input {
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 0;
+}
+
+input:active {
+    border: none;
+}

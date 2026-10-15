@@ -1,0 +1,17 @@
+.textareaWrapper {
+    display: flex;
+    border: 2px solid var(--input-primary);
+    padding: 0px 4px;
+    border-radius: var(--border-radius-s);
+    cursor: pointer;
+    width: 100%;
+}
+
+.textarea {
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 8px 0;
+    resize: none;
+    height: 100px
+}

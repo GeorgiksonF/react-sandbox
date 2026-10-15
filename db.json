@@ -1,0 +1,12 @@
+{
+  "todos": [
+    {
+      "id": "joEZS2nD12M",
+      "title": "sdfsd",
+      "description": "sdfsdf",
+      "status": "waiting",
+      "priority": "medium"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
