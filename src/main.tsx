@@ -6,10 +6,10 @@ import App from './App.tsx'
 import RoutesConfig from './RoutesConfig.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <RoutesConfig />
-      <App />
-    </BrowserRouter>
-  </StrictMode>,
+	<StrictMode>
+		<BrowserRouter>
+			<RoutesConfig />
+			<App />
+		</BrowserRouter>
+	</StrictMode>,
 )

@@ -1,33 +1,45 @@
 :root {
-    --primary: rgb(214, 113, 113);
-    --secondary: rgb(251, 251, 255);
+	--primary: rgb(214, 113, 113);
+	--secondary: rgb(251, 251, 255);
 
-    --text-color-primary: rgb(59, 59, 59);
-    --text-color-disabled: rgb(117, 117, 117);
+	--text-color-primary: rgb(59, 59, 59);
+	--text-color-disabled: rgb(117, 117, 117);
 
-    --input-primary: rgb(214, 214, 228);
-    --input-primary-hover: rgb(223, 223, 241);
+	--border-primary: 2px solid rgb(214, 214, 228);
 
-    --button-color-primary: var(--primary);
-    --button-color-primary-hover: color-mix(in srgb, var(--button-color-primary), var(--text-color-primary) 10%);
-    --button-color-primary-active: color-mix(in srgb, var(--button-color-primary), var(--text-color-primary) 20%);
+	--surface-primary: var(--secondary);
+	--surface-primary-hover: color-mix(in srgb, var(--secondary), var(--text-color-primary) 5%);
 
-    --border-radius-s: 4px;
-    --border-radius-m: 8px;
+	--shadow-primary: 0 10px 30px rgba(0, 0, 0, 0.2);
 
-    --font-size-m: 1rem;
-    --font-size-l: 2rem;
+	--button-color-primary: var(--primary);
+	--button-color-primary-hover: color-mix(
+		in srgb,
+		var(--button-color-primary),
+		var(--text-color-primary) 10%
+	);
+	--button-color-primary-active: color-mix(
+		in srgb,
+		var(--button-color-primary),
+		var(--text-color-primary) 20%
+	);
 
-    font-size: 14px;
-    color: var(--text-color-primary);
+	--border-radius-s: 4px;
+	--border-radius-m: 8px;
+
+	--font-size-m: 1rem;
+	--font-size-l: 2rem;
+
+	font-size: 14px;
+	color: var(--text-color-primary);
 }
 
 * {
-    box-sizing: border-box;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: var(--font-size-m);
+	box-sizing: border-box;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: var(--font-size-m);
 }
 
 h1 {
-    font-size: var(--font-size-l);
+	font-size: var(--font-size-l);
 }

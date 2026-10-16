@@ -1,76 +1,77 @@
 .select {
-    position: relative;
-    width: 100%;
+	position: relative;
+	width: 100%;
 }
 
 .inputWrapper {
-    display: flex;
-    border: 2px solid var(--input-primary);
-    padding: 2px 4px;
-    border-radius: var(--border-radius-s);
-    cursor: pointer;
+	display: flex;
+	border: var(--border-primary);
+	padding: 2px 4px;
+	border-radius: var(--border-radius-s);
+	cursor: pointer;
 }
 
 .input {
-    border: none;
-    outline: none;
-    width: 100%;
-    padding: 0;
+	border: none;
+	outline: none;
+	width: 100%;
+	padding: 0;
 }
 
 input:active {
-    border: none;
+	border: none;
 }
 
 .selected {
-    display: flex;
-    white-space: nowrap;
-    background-color: var(--input-primary);
-    padding: 0 2px;
-    border-radius: var(--border-radius-s);
-    margin-right: 2px;
+	display: flex;
+	white-space: nowrap;
+	background-color: var(--surface-primary);
+	padding: 0 2px;
+	border-radius: var(--border-radius-s);
+	margin-right: 2px;
 }
 
 .remove {
-    background: none;
-    border: none;
-    cursor: pointer;
+	background: none;
+	border: none;
+	cursor: pointer;
 }
 
 .list {
-    z-index: 2000;
-    margin: 0;
-    padding: 8px 0;
-    border-radius: var(--border-radius-s);
-    list-style-type: none;
-    background-color: var(--input-primary);
-    position: absolute;
-    left: 0;
-    right: 0;
+	z-index: 2000;
+	margin: 0;
+	padding: 8px 0;
+	border-radius: var(--border-radius-s);
+	box-shadow: var(--shadow-primary);
+	list-style-type: none;
+	background-color: var(--surface-primary);
+	position: absolute;
+	left: 0;
+	right: 0;
 }
 
 .item {
-    cursor: pointer;
-    padding: 4px 8px;
+	cursor: pointer;
+	padding: 4px 8px;
 }
 
 .item:hover {
-    background-color: var(--input-primary-hover);
+	background-color: var(--surface-primary-hover);
 }
 
 .fallback {
-    z-index: 2000;
-    position: absolute;
-    right: 0;
-    left: 0;
-    background-color: var(--input-primary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50px;
-    border-radius: var(--border-radius-s);
+	z-index: 2000;
+	position: absolute;
+	right: 0;
+	left: 0;
+	background-color: var(--surface-primary);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 50px;
+	border-radius: var(--border-radius-s);
 }
 
 .placeholder {
-    color: var(--text-color-disabled);
+	color: var(--text-color-disabled);
 }

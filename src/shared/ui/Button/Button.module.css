@@ -1,28 +1,28 @@
 .button {
-    cursor: pointer;
-    border: none;
-    border-radius: var(--border-radius-s);
-    color: var(--secondary);
-    height: 24px;
-    padding: 4px 8px;
+	cursor: pointer;
+	border: none;
+	border-radius: var(--border-radius-s);
+	color: var(--secondary);
+	height: 24px;
+	padding: 4px 8px;
 }
 
 .button:active {
-    outline: none;
+	outline: none;
 }
 
 .primary {
-    background-color: var(--button-color-primary);
+	background-color: var(--button-color-primary);
 }
 
 .primary:hover {
-    background-color: var(--button-color-primary-hover);
+	background-color: var(--button-color-primary-hover);
 }
 
 .primary:active {
-    background-color: var(--button-color-primary-active);
+	background-color: var(--button-color-primary-active);
 }
 
 .secondary {
-    background-color: var(--seconary);
+	background-color: var(--seconary);
 }

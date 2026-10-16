@@ -1,0 +1,14 @@
+.table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.th {
+	border-bottom: var(--border-primary);
+	padding: 8px auto;
+}
+
+.td {
+	text-align: center;
+	padding: 15px auto;
+}

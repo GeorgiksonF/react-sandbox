@@ -1,9 +1,7 @@
-import TodoList from "../../features/todo/ui/TodoList";
+import TodoList from '../../features/todo/ui/TodoList'
 
 function TodoPage() {
-    return (
-        <TodoList />
-    )
+	return <TodoList />
 }
 
-export default TodoPage;
+export default TodoPage

@@ -1,0 +1,25 @@
+.wrapper {
+	position: relative;
+	display: inline-flex;
+}
+
+.list {
+	position: absolute;
+	min-width: 150px;
+	list-style-type: none;
+	background: var(--surface-primary);
+	z-index: 220;
+	margin: 0;
+	padding: 8px 0;
+	border-radius: var(--border-radius-s);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.item {
+	cursor: pointer;
+	padding: 8px;
+}
+
+.item:hover {
+	background: var(--surface-primary-hover);
+}
