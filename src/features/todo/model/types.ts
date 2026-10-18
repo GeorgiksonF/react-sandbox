@@ -6,6 +6,7 @@ export interface Todo {
 	title: string
 	description: string
 	status: Status
+	createdAt: string
 	priority: Priority
 }
 

@@ -1,62 +1,38 @@
 import styles from './TodoList.module.css'
-import { useEffect, useState } from 'react'
-import { todoApi } from '../../../api/todoApi'
 import { MultiSelect, Button, Input, useModal, useToggleList } from '../../../shared'
 import TodoEditModal from './TodoEditModal'
 import { STATUSES, PRIORITIES } from '../model/consts'
 import type { Priority, Status, Todo, TodoFormData } from '../model/types'
 import TodoTable from './TodoTable'
+import { useTodoList } from '../model/useTodoList'
 
 function TodoList() {
 	const editModal = useModal<Todo>()
-	const [todos, setTodos] = useState<Todo[]>([])
 	const statusFilter = useToggleList<Status>()
 	const priorityFilter = useToggleList<Priority>()
+	const { todos, saveTodo, deleteTodo, search, setSearch } = useTodoList({
+		statuses: statusFilter.items,
+		priorities: priorityFilter.items,
+	})
 
-	const closeEditTodo = () => {
+	async function saveEditTodo(todo: TodoFormData) {
+		await saveTodo(editModal.data?.id, todo)
 		editModal.close()
 	}
-
-	useEffect(() => {
-		async function getTodos() {
-			const res = await todoApi.getAll()
-			setTodos(res)
-		}
-		getTodos()
-	}, [])
-
-	const saveEditTodo = async (data: TodoFormData) => {
-		if (editModal.data) {
-			const updatedTodo: Todo = {
-				...editModal.data,
-				...data,
-			}
-
-			await todoApi.update(updatedTodo)
-			setTodos(prev => prev.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo)))
-		} else {
-			const todo: Todo = {
-				...data,
-				id: crypto.randomUUID(),
-			}
-
-			await todoApi.create(todo)
-			setTodos(prev => [...prev, todo])
-		}
-
+	async function closeEditTodo() {
 		editModal.close()
-	}
-
-	async function deleteTodo(id: string) {
-		await todoApi.delete(id)
-		setTodos(prev => prev.filter(todo => todo.id !== id))
 	}
 
 	return (
 		<div>
 			<h1>TODO лист</h1>
 			<div className={styles.header}>
-				<Input type="text" placeholder="Поиск" />
+				<Input
+					type="text"
+					placeholder="Поиск..."
+					value={search}
+					onChange={e => setSearch(e.target.value)}
+				/>
 
 				<Button onClick={() => editModal.open()}>Добавить</Button>
 			</div>
