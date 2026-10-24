@@ -1,25 +1,20 @@
 {
   "todos": [
     {
-      "id": "9woafwNjbh8",
       "title": "Задача 1",
-      "description": "Задача 2",
-      "status": "ready",
-      "priority": "low"
+      "description": "Задача 1",
+      "status": "waiting",
+      "priority": "medium",
+      "createdAt": "2026-10-18T17:05:01.326Z",
+      "id": "rkFD7A1d6zs"
     },
     {
-      "id": "HjoLiJtxVEs",
       "title": "Задача 2",
       "description": "Задача 2",
-      "status": "ready",
-      "priority": "high"
-    },
-    {
-      "id": "MhIRAqUN7U8",
-      "title": "Задача 3",
-      "description": "Задача 3",
       "status": "pending",
-      "priority": "high"
+      "priority": "high",
+      "createdAt": "2026-10-18T17:05:17.720Z",
+      "id": "wwqcC5qglHg"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
