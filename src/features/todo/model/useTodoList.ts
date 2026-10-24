@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Priority, Status, Todo, TodoFormData } from './types'
+import { sortItems, type SortState } from '../../../shared/lib'
 import { todoApi } from '../../../api/todoApi'
 
 type UseTodoListProps = {
@@ -11,7 +12,9 @@ type UseTodoListProps = {
 export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProps) {
 	const [search, setSearch] = useState('')
 	const [todos, setTodos] = useState<Todo[]>([])
+	const [sort, setSort] = useState<SortState<Todo> | null>(null)
 	const normalizedSearch = search.trim()
+	const sortedTodos = useMemo(() => sortItems(todos, sort), [todos, sort])
 
 	useEffect(() => {
 		const controller = new AbortController()
@@ -43,8 +46,10 @@ export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProp
 
 	async function saveTodo(id: string | undefined, data: TodoFormData) {
 		if (id) {
+			const current = todos.find(t => t.id === id)
 			const updated: Todo = {
 				id,
+				createdAt: current?.createdAt ?? new Date().toISOString(),
 				...data,
 			}
 
@@ -67,9 +72,11 @@ export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProp
 		setTodos(prev => prev.filter(todo => todo.id !== id))
 	}
 	return {
-		todos,
+		todos: sortedTodos,
 		search,
 		setSearch,
+		sort,
+		setSort,
 		saveTodo,
 		deleteTodo,
 	}

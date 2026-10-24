@@ -20,7 +20,7 @@ function TodoList() {
 	const priorityFilter = useToggleList<Priority>()
 	const [createdAtFilter, setCreatedAtFilter] = useState<string[]>([])
 
-	const { todos, saveTodo, deleteTodo, search, setSearch } = useTodoList({
+	const { todos, saveTodo, deleteTodo, search, setSearch, sort, setSort } = useTodoList({
 		statuses: statusFilter.items,
 		priorities: priorityFilter.items,
 		createdAt: createdAtFilter,
@@ -64,6 +64,8 @@ function TodoList() {
 			</div>
 			<TodoTable
 				todos={todos}
+				sort={sort}
+				onSortChange={setSort}
 				className={styles.table}
 				onEdit={editModal.open}
 				onDelete={deleteTodo}

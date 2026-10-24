@@ -10,4 +10,4 @@ export interface Todo {
 	priority: Priority
 }
 
-export type TodoFormData = Omit<Todo, 'id'>
+export type TodoFormData = Omit<Todo, 'id' | 'createdAt'>

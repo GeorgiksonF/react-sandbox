@@ -1,23 +1,28 @@
 import { Dropdown, Table } from '../../../shared'
+import { formatDate, type SortState } from '../../../shared/lib'
 import { PRIORITY_LABELS, STATUS_LABELS } from '../model/consts'
 import type { Todo } from '../model/types'
 
 type Props = {
 	todos: Todo[]
+	sort?: SortState<Todo> | null
+	onSortChange?: (sort: SortState<Todo> | null) => void
 	className?: string
 	onEdit?: (todo: Todo) => void
 	onDelete?: (id: string) => void
 }
 
-function TodoTable({ todos, className, onEdit, onDelete }: Props) {
+function TodoTable({ todos, sort, onSortChange, className, onEdit, onDelete }: Props) {
 	return (
 		<Table
 			data={todos}
 			rowKey={todo => todo.id}
+			sort={sort}
+			onSortChange={onSortChange}
 			emptyText="Нет активных задач"
 			className={className}
 		>
-			<Table.Column<Todo> field="title" title="Название" />
+			<Table.Column<Todo> field="title" title="Название" sortable />
 			<Table.Column<Todo>
 				title="Статус"
 				field="status"
@@ -27,6 +32,12 @@ function TodoTable({ todos, className, onEdit, onDelete }: Props) {
 				title="Приоритет"
 				field="priority"
 				render={todo => PRIORITY_LABELS[todo.priority]}
+			/>
+			<Table.Column<Todo>
+				title="Дата создания"
+				field="createdAt"
+				render={todo => formatDate(todo.createdAt)}
+				sortable
 			/>
 			<Table.Column<Todo>
 				id="actions"
