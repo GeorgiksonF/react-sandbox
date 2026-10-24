@@ -5,11 +5,13 @@ import { todoApi } from '../../../api/todoApi'
 type UseTodoListProps = {
 	statuses: Status[]
 	priorities: Priority[]
+	createdAt: string[]
 }
 
-export function useTodoList({ statuses, priorities }: UseTodoListProps) {
+export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProps) {
 	const [search, setSearch] = useState('')
 	const [todos, setTodos] = useState<Todo[]>([])
+	const normalizedSearch = search.trim()
 
 	useEffect(() => {
 		const controller = new AbortController()
@@ -18,9 +20,10 @@ export function useTodoList({ statuses, priorities }: UseTodoListProps) {
 			try {
 				const res = await todoApi.getAll(
 					{
-						search,
+						search: normalizedSearch || undefined,
 						priorities,
 						statuses,
+						createdAt,
 					},
 					controller.signal,
 				)
@@ -30,13 +33,13 @@ export function useTodoList({ statuses, priorities }: UseTodoListProps) {
 			}
 		}
 
-		const timer = setTimeout(async () => fetchTodos(), search ? 400 : 0)
+		const timer = setTimeout(async () => fetchTodos(), normalizedSearch ? 400 : 0)
 
 		return () => {
 			controller.abort()
 			clearTimeout(timer)
 		}
-	}, [search, statuses, priorities])
+	}, [normalizedSearch, statuses, priorities, createdAt])
 
 	async function saveTodo(id: string | undefined, data: TodoFormData) {
 		if (id) {

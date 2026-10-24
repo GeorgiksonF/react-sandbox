@@ -1,0 +1,56 @@
+.days {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 0;
+}
+
+.rangeDay {
+	isolation: isolate;
+}
+
+.rangeDay.inRange {
+	background-color: color-mix(in srgb, var(--primary), var(--surface-primary) 82%);
+	border-radius: 0;
+}
+
+.rangeDay.inRange:hover {
+	background-color: color-mix(in srgb, var(--primary), var(--surface-primary) 70%);
+}
+
+.rangeDay.selected {
+	background-color: var(--primary);
+	color: var(--secondary);
+	border-radius: var(--border-radius-s);
+}
+
+.rangeDay.selected:hover {
+	background-color: var(--button-color-primary-hover);
+}
+
+.rangeDay.rangeStart,
+.rangeDay.rangeEnd {
+	background-color: var(--primary);
+	color: var(--secondary);
+	border-radius: 0;
+}
+
+.rangeDay.rangeStart {
+	border-top-left-radius: var(--border-radius-s);
+	border-bottom-left-radius: var(--border-radius-s);
+}
+
+.rangeDay.rangeEnd {
+	border-top-right-radius: var(--border-radius-s);
+	border-bottom-right-radius: var(--border-radius-s);
+}
+
+.rangeDay.rangeStart:hover,
+.rangeDay.rangeEnd:hover {
+	background-color: var(--button-color-primary-hover);
+}
+
+.footerActions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}

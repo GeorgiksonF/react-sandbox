@@ -1,18 +1,29 @@
 import styles from './TodoList.module.css'
-import { MultiSelect, Button, Input, useModal, useToggleList } from '../../../shared'
+import {
+	MultiSelect,
+	Button,
+	Input,
+	useModal,
+	useToggleList,
+	DatePickerRange,
+} from '../../../shared'
 import TodoEditModal from './TodoEditModal'
 import { STATUSES, PRIORITIES } from '../model/consts'
 import type { Priority, Status, Todo, TodoFormData } from '../model/types'
 import TodoTable from './TodoTable'
 import { useTodoList } from '../model/useTodoList'
+import { useState } from 'react'
 
 function TodoList() {
 	const editModal = useModal<Todo>()
 	const statusFilter = useToggleList<Status>()
 	const priorityFilter = useToggleList<Priority>()
+	const [createdAtFilter, setCreatedAtFilter] = useState<string[]>([])
+
 	const { todos, saveTodo, deleteTodo, search, setSearch } = useTodoList({
 		statuses: statusFilter.items,
 		priorities: priorityFilter.items,
+		createdAt: createdAtFilter,
 	})
 
 	async function saveEditTodo(todo: TodoFormData) {
@@ -49,6 +60,7 @@ function TodoList() {
 					placeholder="Приоритет"
 					onSelect={priorityFilter.toggle}
 				/>
+				<DatePickerRange value={createdAtFilter} onChange={setCreatedAtFilter} />
 			</div>
 			<TodoTable
 				todos={todos}

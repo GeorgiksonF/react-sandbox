@@ -5,6 +5,7 @@ type GetTodosParams = {
 	search?: string
 	statuses?: Status[]
 	priorities?: Priority[]
+	createdAt?: string[]
 }
 export const todoApi = {
 	create: (todo: Todo) => api.post<Todo>('/todos', todo),
@@ -23,6 +24,17 @@ export const todoApi = {
 
 		if (params?.priorities && params?.priorities.length > 0) {
 			where.priority = { in: params.priorities }
+		}
+
+		if (params?.createdAt && params.createdAt.length > 0) {
+			const [from, to = from] = params.createdAt
+			const start = new Date(`${from}T00:00:00.000`)
+			const end = new Date(`${to}T23:59:59.999`)
+
+			where.createdAt = {
+				gte: start.toISOString(),
+				lte: end.toISOString(),
+			}
 		}
 
 		if (Object.keys(where).length > 0) {

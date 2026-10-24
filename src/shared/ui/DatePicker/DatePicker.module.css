@@ -1,0 +1,213 @@
+.datePicker {
+	position: relative;
+	width: 100%;
+}
+
+.inputWrapper {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	border: var(--border-primary);
+	padding: 0 4px;
+	border-radius: var(--border-radius-s);
+	cursor: text;
+	height: 24px;
+	width: 100%;
+	background-color: var(--surface-primary);
+	transition: border-color 0.15s ease;
+}
+
+.inputWrapper:focus-within {
+	border-color: var(--primary);
+}
+
+.inputWrapper.invalid {
+	border-color: var(--primary);
+}
+
+.inputWrapper.disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.input {
+	border: none;
+	outline: none;
+	width: 100%;
+	min-width: 0;
+	padding: 0;
+	background: transparent;
+	color: inherit;
+}
+
+.input::placeholder {
+	color: var(--text-color-disabled);
+}
+
+.input:disabled {
+	cursor: not-allowed;
+}
+
+.iconButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 0;
+	border: none;
+	background: none;
+	border-radius: var(--border-radius-s);
+	color: var(--text-color-disabled);
+	cursor: pointer;
+}
+
+.iconButton:hover {
+	color: var(--text-color-primary);
+}
+
+.iconButton:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 1px;
+}
+
+.iconButton:disabled {
+	cursor: not-allowed;
+}
+
+.popover {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	z-index: 2000;
+	width: 252px;
+	padding: 8px;
+	background-color: var(--surface-primary);
+	border-radius: var(--border-radius-s);
+	box-shadow: var(--shadow-primary);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 4px;
+	margin-bottom: 8px;
+}
+
+.title {
+	font-weight: 600;
+	user-select: none;
+	white-space: nowrap;
+}
+
+.navButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: none;
+	border-radius: var(--border-radius-s);
+	background: none;
+	color: var(--text-color-primary);
+	cursor: pointer;
+	font-size: var(--font-size-m);
+	line-height: 1;
+}
+
+.navButton:hover {
+	background-color: var(--surface-primary-hover);
+}
+
+.navButton:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 1px;
+}
+
+.weekdays {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	margin-bottom: 4px;
+}
+
+.weekday {
+	text-align: center;
+	color: var(--text-color-disabled);
+	font-size: 12px;
+	line-height: 20px;
+}
+
+.days {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 2px;
+}
+
+.day {
+	height: 28px;
+	padding: 0;
+	border: none;
+	border-radius: var(--border-radius-s);
+	background: none;
+	color: var(--text-color-primary);
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.day:hover {
+	background-color: var(--surface-primary-hover);
+}
+
+.day:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: -2px;
+}
+
+.dayOutside {
+	color: var(--text-color-disabled);
+	opacity: 0.6;
+}
+
+.today {
+	font-weight: 600;
+	box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.selected {
+	background-color: var(--primary);
+	color: var(--secondary);
+}
+
+.selected:hover {
+	background-color: var(--button-color-primary-hover);
+}
+
+.footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid color-mix(in srgb, var(--text-color-disabled), transparent 75%);
+}
+
+.footerButton {
+	padding: 2px 4px;
+	border: none;
+	border-radius: var(--border-radius-s);
+	background: none;
+	color: var(--primary);
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.footerButton:hover {
+	background-color: var(--surface-primary-hover);
+}
+
+.footerButton:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 1px;
+}
