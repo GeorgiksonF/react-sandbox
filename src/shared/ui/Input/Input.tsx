@@ -1,15 +1,13 @@
-import styles from './Inpute.module.css'
+import styles from './Input.module.css'
 
-type InputProps = React.ComponentPropsWithoutRef<'input'>
+type InputProps = React.ComponentPropsWithRef<'input'>
 
-function Input({ value, onChange, ...rest }: InputProps) {
+function Input({ type = 'text', className, ...rest }: InputProps) {
 	return (
 		<div className={styles.inputWrapper}>
 			<input
-				type="text"
-				className={styles.input}
-				onChange={onChange}
-				value={value}
+				type={type}
+				className={`${styles.input}${className ? ` ${className}` : ''}`}
 				{...rest}
 			/>
 		</div>

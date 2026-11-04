@@ -1,49 +1,58 @@
 import styles from './TodoForm.module.css'
-import { useState } from 'react'
-import { Input, Textarea, Select } from '../../../shared'
+import { Controller, useFormContext } from 'react-hook-form'
+import { Field, Input, Textarea, Select } from '../../../shared'
 import { PRIORITIES, STATUSES } from '../model/consts'
-import type { Todo, TodoFormData } from '../model/types'
+import type { TodoFormData, TodoFormInput } from '../model/types'
 
-type Props = {
-	todo: Todo | null
-	formId: string
-	onClose: () => void
-	onSave: (todo: TodoFormData) => void
-}
+function TodoForm() {
+	const {
+		register,
+		control,
+		formState: { errors },
+	} = useFormContext<TodoFormInput, unknown, TodoFormData>()
 
-function TodoForm({ todo, formId, onSave }: Props) {
-	const [title, setTitle] = useState(todo?.title ?? '')
-	const [description, setDescription] = useState(todo?.description ?? '')
-	const [status, setStatus] = useState(todo?.status ?? null)
-	const [priority, setPriority] = useState(todo?.priority ?? null)
-
-	function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-		e.preventDefault()
-		if (priority && status) {
-			onSave({
-				title,
-				description,
-				status,
-				priority,
-			})
-		}
-	}
 	return (
-		<form className={styles.form} id={formId} onSubmit={handleSubmit}>
-			<Input placeholder="Названиe" value={title} onChange={e => setTitle(e.target.value)} />
-			<Textarea
-				placeholder="Описание"
-				value={description}
-				onChange={e => setDescription(e.target.value)}
-			/>
-			<Select placeholder="Статус" items={STATUSES} selected={status} onSelect={setStatus} />
-			<Select
-				placeholder="Приоритет"
-				items={PRIORITIES}
-				selected={priority}
-				onSelect={setPriority}
-			/>
-		</form>
+		<div className={styles.form}>
+			<Field error={errors.title?.message}>
+				<Input placeholder="Название" {...register('title')} />
+			</Field>
+			<Field error={errors.description?.message}>
+				<Textarea placeholder="Описание" {...register('description')} />
+			</Field>
+			<Field error={errors.status?.message}>
+				<Controller
+					control={control}
+					name="status"
+					render={({ field }) => (
+						<Select
+							placeholder="Статус"
+							items={STATUSES}
+							selected={field.value}
+							onSelect={field.onChange}
+						/>
+					)}
+				/>
+			</Field>
+			<Field error={errors.priority?.message}>
+				<Controller
+					control={control}
+					name="priority"
+					render={({ field }) => (
+						<Select
+							placeholder="Приоритет"
+							items={PRIORITIES}
+							selected={field.value}
+							onSelect={field.onChange}
+						/>
+					)}
+				/>
+			</Field>
+			{errors.root?.message && (
+				<p className={styles.formError} role="alert">
+					{errors.root.message}
+				</p>
+			)}
+		</div>
 	)
 }
 

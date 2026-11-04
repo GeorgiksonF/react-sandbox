@@ -22,7 +22,7 @@
 }
 
 .inputWrapper.invalid {
-	border-color: var(--primary);
+	border-color: var(--color-error);
 }
 
 .inputWrapper.disabled {

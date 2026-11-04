@@ -55,7 +55,11 @@ function TodoTable({ todos, sort, onSortChange, className, onEdit, onDelete }: P
 						},
 					]
 
-					return <Dropdown list={actions}>...</Dropdown>
+					return (
+						<Dropdown variant="secondary" list={actions}>
+							...
+						</Dropdown>
+					)
 				}}
 			/>
 		</Table>

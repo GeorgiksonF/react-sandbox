@@ -1,0 +1,9 @@
+.field {
+	display: grid;
+	gap: 4px;
+}
+
+.error {
+	margin: 0;
+	color: var(--color-error);
+}

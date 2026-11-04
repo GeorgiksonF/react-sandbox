@@ -11,6 +11,11 @@
 	outline: none;
 }
 
+.button:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
 .primary {
 	background-color: var(--button-color-primary);
 }
@@ -24,5 +29,22 @@
 }
 
 .secondary {
-	background-color: var(--seconary);
+	background-color: var(--surface-primary-hover);
+	color: var(--text-color-primary);
+}
+
+.secondary:hover {
+	background-color: color-mix(
+		in srgb,
+		var(--surface-primary-hover),
+		var(--text-color-primary) 8%
+	);
+}
+
+.primary:disabled {
+	background-color: var(--button-color-primary);
+}
+
+.secondary:disabled {
+	background-color: var(--surface-primary-hover);
 }

@@ -1,21 +1,109 @@
 {
-  "todos": [
-    {
-      "title": "Задача 1",
-      "description": "Задача 1",
-      "status": "waiting",
-      "priority": "medium",
-      "createdAt": "2026-10-18T17:05:01.326Z",
-      "id": "rkFD7A1d6zs"
-    },
-    {
-      "title": "Задача 2",
-      "description": "Задача 2",
-      "status": "pending",
-      "priority": "high",
-      "createdAt": "2026-10-18T17:05:17.720Z",
-      "id": "wwqcC5qglHg"
-    }
-  ],
-  "$schema": "./node_modules/json-server/schema.json"
+	"todos": [
+		{
+			"title": "Задача 3",
+			"description": "Задача 3",
+			"status": "waiting",
+			"priority": "high",
+			"createdAt": "2026-10-18T17:05:17.720Z",
+			"id": "wwqcC5qglHg"
+		},
+		{
+			"title": "Свёрстать карточку задачи",
+			"description": "Перенести текущую вёрстку строки таблицы в переиспользуемую карточку",
+			"status": "waiting",
+			"priority": "medium",
+			"createdAt": "2026-09-28T09:15:00.000Z",
+			"id": "aXb1C2d3E4f"
+		},
+		{
+			"title": "Подключить кэш серверных данных",
+			"description": "TanStack Query или RTK Query — выбрать и внедрить вместо version",
+			"status": "pending",
+			"priority": "high",
+			"createdAt": "2026-09-29T11:40:00.000Z",
+			"id": "gHi5J6k7L8m"
+		},
+		{
+			"title": "Написать тесты для сортировки",
+			"description": "Покрыть sortItems: числа, строки, null, кириллица",
+			"status": "waiting",
+			"priority": "low",
+			"createdAt": "2026-09-30T08:05:00.000Z",
+			"id": "nOp9Q0r1S2t"
+		},
+		{
+			"title": "Добавить пагинацию таблицы",
+			"description": "Серверная пагинация json-server: _page и _per_page",
+			"status": "waiting",
+			"priority": "medium",
+			"createdAt": "2026-10-01T14:20:00.000Z",
+			"id": "uVw3X4y5Z6a"
+		},
+		{
+			"title": "Закрыть модалку по Escape",
+			"description": "Слушатель keydown на document, снятие при размонтировании",
+			"status": "ready",
+			"priority": "high",
+			"createdAt": "2026-10-02T10:00:00.000Z",
+			"id": "bCd7Ef8Gh9i"
+		},
+		{
+			"title": "Вынести BASE_URL в переменные окружения",
+			"description": "VITE_API_URL в .env, запасное значение в коде",
+			"status": "ready",
+			"priority": "medium",
+			"createdAt": "2026-10-03T16:45:00.000Z",
+			"id": "jKl0MnO1P2q"
+		},
+		{
+			"title": "Отрефакторить Dropdown",
+			"description": "Пробросить aria-атрибуты и закрытие по Escape",
+			"status": "pending",
+			"priority": "low",
+			"createdAt": "2026-10-06T12:30:00.000Z",
+			"id": "rSt3Uv4Wx5y"
+		},
+		{
+			"title": "Проверить адаптивность таблицы",
+			"description": "Горизонтальный скролл на ширине меньше 768px",
+			"status": "waiting",
+			"priority": "medium",
+			"createdAt": "2026-10-09T09:10:00.000Z",
+			"id": "zAb6Cd7Ef8g"
+		},
+		{
+			"title": "Собрать демо для ревью",
+			"description": "Сценарий: поиск, фильтры по статусу и приоритету, диапазон дат",
+			"status": "pending",
+			"priority": "high",
+			"createdAt": "2026-10-13T18:05:00.000Z",
+			"id": "hIj9Kl0Mn1o"
+		},
+		{
+			"title": "Обновить README",
+			"description": "Описать запуск json-server и переменные окружения",
+			"status": "waiting",
+			"priority": "low",
+			"createdAt": "2026-10-16T07:50:00.000Z",
+			"id": "pQr2St3Uv4w"
+		},
+		{
+			"title": "Разобраться с фильтром по датам",
+			"description": "Проверить границы gte/lte и однодневный диапазон",
+			"status": "ready",
+			"priority": "medium",
+			"createdAt": "2026-10-20T13:25:00.000Z",
+			"id": "xYz5Ab6Cd7e"
+		},
+		{
+			"title": "Подготовить релиз 1.0",
+			"description": "Прогнать lint и build, проверить сборку на preview",
+			"status": "pending",
+			"priority": "high",
+			"createdAt": "2026-10-24T15:35:00.000Z",
+			"id": "fGh8Ij9Kl0m"
+		}
+	],
+	"$schema": "./node_modules/json-server/schema.json"
 }

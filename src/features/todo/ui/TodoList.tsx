@@ -20,11 +20,12 @@ function TodoList() {
 	const priorityFilter = useToggleList<Priority>()
 	const [createdAtFilter, setCreatedAtFilter] = useState<string[]>([])
 
-	const { todos, saveTodo, deleteTodo, search, setSearch, sort, setSort } = useTodoList({
-		statuses: statusFilter.items,
-		priorities: priorityFilter.items,
-		createdAt: createdAtFilter,
-	})
+	const { todos, saveTodo, deleteTodo, search, setSearch, sort, setSort, isLoading, error } =
+		useTodoList({
+			statuses: statusFilter.items,
+			priorities: priorityFilter.items,
+			createdAt: createdAtFilter,
+		})
 
 	async function saveEditTodo(todo: TodoFormData) {
 		await saveTodo(editModal.data?.id, todo)
@@ -62,14 +63,23 @@ function TodoList() {
 				/>
 				<DatePickerRange value={createdAtFilter} onChange={setCreatedAtFilter} />
 			</div>
-			<TodoTable
-				todos={todos}
-				sort={sort}
-				onSortChange={setSort}
-				className={styles.table}
-				onEdit={editModal.open}
-				onDelete={deleteTodo}
-			/>
+			{error && (
+				<div className={styles.error} role="alert">
+					{error}
+				</div>
+			)}
+			{isLoading ? (
+				<div className={styles.status}>Загрузка…</div>
+			) : (
+				<TodoTable
+					todos={todos}
+					sort={sort}
+					onSortChange={setSort}
+					className={styles.table}
+					onEdit={editModal.open}
+					onDelete={deleteTodo}
+				/>
+			)}
 			{editModal.isOpen && (
 				<TodoEditModal
 					todo={editModal.data}
