@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 type HttpMethods = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -7,6 +9,7 @@ interface RequestOptions {
 	body?: unknown
 	headers?: Record<string, string>
 	abortSignal?: AbortSignal
+	schema?: z.ZodType
 }
 
 async function request<TResponse>(endpoint: string, options: RequestOptions): Promise<TResponse> {
@@ -42,14 +45,29 @@ async function request<TResponse>(endpoint: string, options: RequestOptions): Pr
 		return null as TResponse
 	}
 
-	return (await response.json()) as TResponse
+	const data: unknown = await response.json()
+
+	if (options.schema) {
+		const result = options.schema.safeParse(data)
+
+		if (!result.success) {
+			throw new Error(`Некорректный ответ сервера: ${z.prettifyError(result.error)}`)
+		}
+
+		return result.data as TResponse
+	}
+
+	return data as TResponse
 }
 
 export const api = {
-	get: <T>(endpoint: string, abortSignal?: AbortSignal) =>
-		request<T>(endpoint, { method: 'GET', abortSignal }),
-	post: <T>(endpoint: string, body: unknown) => request<T>(endpoint, { method: 'POST', body }),
-	put: <T>(endpoint: string, body: unknown) => request<T>(endpoint, { method: 'PUT', body }),
-	patch: <T>(endpoint: string, body: unknown) => request<T>(endpoint, { method: 'PATCH', body }),
+	get: <T>(endpoint: string, abortSignal?: AbortSignal, schema?: z.ZodType<T>) =>
+		request<T>(endpoint, { method: 'GET', abortSignal, schema }),
+	post: <T>(endpoint: string, body: unknown, schema?: z.ZodType<T>) =>
+		request<T>(endpoint, { method: 'POST', body, schema }),
+	put: <T>(endpoint: string, body: unknown, schema?: z.ZodType<T>) =>
+		request<T>(endpoint, { method: 'PUT', body, schema }),
+	patch: <T>(endpoint: string, body: unknown, schema?: z.ZodType<T>) =>
+		request<T>(endpoint, { method: 'PATCH', body, schema }),
 	delete: (endpoint: string) => request<null>(endpoint, { method: 'DELETE' }),
 }

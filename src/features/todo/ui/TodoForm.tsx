@@ -1,7 +1,9 @@
 import styles from './TodoForm.module.css'
 import { useState } from 'react'
-import { Input, Textarea, Select } from '../../../shared'
+import { z } from 'zod'
+import { Field, Input, Textarea, Select } from '../../../shared'
 import { PRIORITIES, STATUSES } from '../model/consts'
+import { todoFormSchema } from '../model/schema'
 import type { Todo, TodoFormData } from '../model/types'
 
 type Props = {
@@ -11,51 +13,60 @@ type Props = {
 	onSave: (todo: TodoFormData) => void
 }
 
+type FieldErrors = Partial<Record<keyof TodoFormData, string[]>>
+
 function TodoForm({ todo, formId, onSave }: Props) {
 	const [title, setTitle] = useState(todo?.title ?? '')
 	const [description, setDescription] = useState(todo?.description ?? '')
 	const [status, setStatus] = useState(todo?.status ?? null)
 	const [priority, setPriority] = useState(todo?.priority ?? null)
-	const [error, setError] = useState('')
+	const [errors, setErrors] = useState<FieldErrors>({})
 
 	function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
 		e.preventDefault()
 
-		const normalizedTitle = title.trim()
+		const result = todoFormSchema.safeParse({ title, description, status, priority })
 
-		if (!normalizedTitle || !status || !priority) {
-			setError('Заполните название, статус и приоритет')
+		if (!result.success) {
+			setErrors(z.flattenError(result.error).fieldErrors)
 			return
 		}
 
-		setError('')
-		onSave({
-			title: normalizedTitle,
-			description: description.trim(),
-			status,
-			priority,
-		})
+		setErrors({})
+		onSave(result.data)
 	}
 	return (
 		<form className={styles.form} id={formId} onSubmit={handleSubmit} noValidate>
-			<Input placeholder="Название" value={title} onChange={e => setTitle(e.target.value)} />
-			<Textarea
-				placeholder="Описание"
-				value={description}
-				onChange={e => setDescription(e.target.value)}
-			/>
-			<Select placeholder="Статус" items={STATUSES} selected={status} onSelect={setStatus} />
-			<Select
-				placeholder="Приоритет"
-				items={PRIORITIES}
-				selected={priority}
-				onSelect={setPriority}
-			/>
-			{error && (
-				<p className={styles.error} role="alert">
-					{error}
-				</p>
-			)}
+			<Field error={errors.title?.[0]}>
+				<Input
+					placeholder="Название"
+					value={title}
+					onChange={e => setTitle(e.target.value)}
+				/>
+			</Field>
+			<Field error={errors.description?.[0]}>
+				<Textarea
+					placeholder="Описание"
+					value={description}
+					onChange={e => setDescription(e.target.value)}
+				/>
+			</Field>
+			<Field error={errors.status?.[0]}>
+				<Select
+					placeholder="Статус"
+					items={STATUSES}
+					selected={status}
+					onSelect={setStatus}
+				/>
+			</Field>
+			<Field error={errors.priority?.[0]}>
+				<Select
+					placeholder="Приоритет"
+					items={PRIORITIES}
+					selected={priority}
+					onSelect={setPriority}
+				/>
+			</Field>
 		</form>
 	)
 }

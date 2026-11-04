@@ -1,4 +1,5 @@
 import type { Priority, Status, Todo } from '../features/todo/model/types'
+import { todoSchema } from '../features/todo/model/schema'
 import { api } from './client'
 
 type GetTodosParams = {
@@ -19,8 +20,8 @@ export const todoKeys = {
 }
 
 export const todoApi = {
-	create: (todo: Omit<Todo, 'id'>) => api.post<Todo>('/todos', todo),
-	update: (todo: Todo) => api.patch<Todo>(`/todos/${todo.id}`, todo),
+	create: (todo: Omit<Todo, 'id'>) => api.post<Todo>('/todos', todo, todoSchema),
+	update: (todo: Todo) => api.patch<Todo>(`/todos/${todo.id}`, todo, todoSchema),
 	getAll: (params?: GetTodosParams, signal?: AbortSignal) => {
 		const searchParams = new URLSearchParams()
 		const where: Record<string, unknown> = {}
@@ -53,7 +54,7 @@ export const todoApi = {
 		}
 
 		const query = searchParams.toString()
-		return api.get<Todo[]>(`/todos${query ? `?${query}` : ''}`, signal)
+		return api.get<Todo[]>(`/todos${query ? `?${query}` : ''}`, signal, todoSchema.array())
 	},
 	delete: (id: string) => api.delete(`/todos/${id}`),
 }
