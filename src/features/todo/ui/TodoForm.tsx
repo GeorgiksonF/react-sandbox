@@ -1,45 +1,18 @@
 import styles from './TodoForm.module.css'
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import type { z } from 'zod'
+import { Controller, useFormContext } from 'react-hook-form'
 import { Field, Input, Textarea, Select } from '../../../shared'
 import { PRIORITIES, STATUSES } from '../model/consts'
-import { todoFormSchema } from '../model/schema'
-import type { Todo, TodoFormData } from '../model/types'
+import type { TodoFormData, TodoFormInput } from '../model/types'
 
-type Props = {
-	todo: Todo | null
-	formId: string
-	onClose: () => void
-	onSave: (todo: TodoFormData) => void
-}
-
-type FormInput = z.input<typeof todoFormSchema>
-type FormOutput = z.output<typeof todoFormSchema>
-
-function TodoForm({ todo, formId, onSave }: Props) {
+function TodoForm() {
 	const {
 		register,
 		control,
-		handleSubmit,
 		formState: { errors },
-	} = useForm<FormInput, unknown, FormOutput>({
-		resolver: zodResolver(todoFormSchema),
-		defaultValues: {
-			title: todo?.title ?? '',
-			description: todo?.description ?? '',
-			status: todo?.status ?? null,
-			priority: todo?.priority ?? null,
-		},
-	})
+	} = useFormContext<TodoFormInput, unknown, TodoFormData>()
 
 	return (
-		<form
-			className={styles.form}
-			id={formId}
-			onSubmit={handleSubmit(data => onSave(data))}
-			noValidate
-		>
+		<div className={styles.form}>
 			<Field error={errors.title?.message}>
 				<Input placeholder="Название" {...register('title')} />
 			</Field>
@@ -74,7 +47,12 @@ function TodoForm({ todo, formId, onSave }: Props) {
 					)}
 				/>
 			</Field>
-		</form>
+			{errors.root?.message && (
+				<p className={styles.formError} role="alert">
+					{errors.root.message}
+				</p>
+			)}
+		</div>
 	)
 }
 

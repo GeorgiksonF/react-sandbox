@@ -48,19 +48,13 @@ export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProp
 		[todosQuery.data, sort],
 	)
 
-	async function saveTodo(id: string | undefined, data: TodoFormData): Promise<boolean> {
+	async function saveTodo(id: string | undefined, data: TodoFormData): Promise<void> {
 		setActionError(null)
 
-		try {
-			const current = todosQuery.data?.find(todo => todo.id === id)
-			const createdAt = current?.createdAt ?? new Date().toISOString()
+		const current = todosQuery.data?.find(todo => todo.id === id)
+		const createdAt = current?.createdAt ?? new Date().toISOString()
 
-			await saveMutation.mutateAsync(id ? { id, createdAt, ...data } : { ...data, createdAt })
-			return true
-		} catch (err) {
-			setActionError(err instanceof Error ? err.message : 'Не удалось сохранить задачу')
-			return false
-		}
+		await saveMutation.mutateAsync(id ? { id, createdAt, ...data } : { ...data, createdAt })
 	}
 
 	async function deleteTodo(id: string) {

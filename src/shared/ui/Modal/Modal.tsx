@@ -9,9 +9,10 @@ type ModalProps = {
 	width?: number
 	title?: string
 	onClose: () => void
+	formProps?: React.ComponentPropsWithoutRef<'form'>
 }
 
-function Modal({ children, footer, width, title = '', onClose }: ModalProps) {
+function Modal({ children, footer, width, title = '', onClose, formProps }: ModalProps) {
 	useEffect(() => {
 		function handleKeyDown(event: KeyboardEvent) {
 			if (event.key === 'Escape') onClose()
@@ -23,6 +24,13 @@ function Modal({ children, footer, width, title = '', onClose }: ModalProps) {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
 	}, [onClose])
+
+	const body = (
+		<>
+			<div className={styles.content}>{children}</div>
+			{footer && <div className={styles.footer}>{footer}</div>}
+		</>
+	)
 
 	return createPortal(
 		<div
@@ -36,8 +44,7 @@ function Modal({ children, footer, width, title = '', onClose }: ModalProps) {
 					<div className={styles.title}>{title}</div>
 					<Button onClick={onClose}>x</Button>
 				</div>
-				<div className={styles.content}>{children}</div>
-				{footer && <div className={styles.footer}>{footer}</div>}
+				{formProps ? <form {...formProps}>{body}</form> : body}
 			</div>
 		</div>,
 		document.body,

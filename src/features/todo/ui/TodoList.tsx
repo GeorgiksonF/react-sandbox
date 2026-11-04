@@ -28,9 +28,8 @@ function TodoList() {
 		})
 
 	async function saveEditTodo(todo: TodoFormData) {
-		const isSaved = await saveTodo(editModal.data?.id, todo)
-
-		if (isSaved) editModal.close()
+		await saveTodo(editModal.data?.id, todo)
+		editModal.close()
 	}
 	async function closeEditTodo() {
 		editModal.close()
