@@ -1,6 +1,7 @@
 import styles from './TodoForm.module.css'
-import { useState } from 'react'
-import { z } from 'zod'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { z } from 'zod'
 import { Field, Input, Textarea, Select } from '../../../shared'
 import { PRIORITIES, STATUSES } from '../model/consts'
 import { todoFormSchema } from '../model/schema'
@@ -13,58 +14,64 @@ type Props = {
 	onSave: (todo: TodoFormData) => void
 }
 
-type FieldErrors = Partial<Record<keyof TodoFormData, string[]>>
+type FormInput = z.input<typeof todoFormSchema>
+type FormOutput = z.output<typeof todoFormSchema>
 
 function TodoForm({ todo, formId, onSave }: Props) {
-	const [title, setTitle] = useState(todo?.title ?? '')
-	const [description, setDescription] = useState(todo?.description ?? '')
-	const [status, setStatus] = useState(todo?.status ?? null)
-	const [priority, setPriority] = useState(todo?.priority ?? null)
-	const [errors, setErrors] = useState<FieldErrors>({})
+	const {
+		register,
+		control,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<FormInput, unknown, FormOutput>({
+		resolver: zodResolver(todoFormSchema),
+		defaultValues: {
+			title: todo?.title ?? '',
+			description: todo?.description ?? '',
+			status: todo?.status ?? null,
+			priority: todo?.priority ?? null,
+		},
+	})
 
-	function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-		e.preventDefault()
-
-		const result = todoFormSchema.safeParse({ title, description, status, priority })
-
-		if (!result.success) {
-			setErrors(z.flattenError(result.error).fieldErrors)
-			return
-		}
-
-		setErrors({})
-		onSave(result.data)
-	}
 	return (
-		<form className={styles.form} id={formId} onSubmit={handleSubmit} noValidate>
-			<Field error={errors.title?.[0]}>
-				<Input
-					placeholder="Название"
-					value={title}
-					onChange={e => setTitle(e.target.value)}
+		<form
+			className={styles.form}
+			id={formId}
+			onSubmit={handleSubmit(data => onSave(data))}
+			noValidate
+		>
+			<Field error={errors.title?.message}>
+				<Input placeholder="Название" {...register('title')} />
+			</Field>
+			<Field error={errors.description?.message}>
+				<Textarea placeholder="Описание" {...register('description')} />
+			</Field>
+			<Field error={errors.status?.message}>
+				<Controller
+					control={control}
+					name="status"
+					render={({ field }) => (
+						<Select
+							placeholder="Статус"
+							items={STATUSES}
+							selected={field.value}
+							onSelect={field.onChange}
+						/>
+					)}
 				/>
 			</Field>
-			<Field error={errors.description?.[0]}>
-				<Textarea
-					placeholder="Описание"
-					value={description}
-					onChange={e => setDescription(e.target.value)}
-				/>
-			</Field>
-			<Field error={errors.status?.[0]}>
-				<Select
-					placeholder="Статус"
-					items={STATUSES}
-					selected={status}
-					onSelect={setStatus}
-				/>
-			</Field>
-			<Field error={errors.priority?.[0]}>
-				<Select
-					placeholder="Приоритет"
-					items={PRIORITIES}
-					selected={priority}
-					onSelect={setPriority}
+			<Field error={errors.priority?.message}>
+				<Controller
+					control={control}
+					name="priority"
+					render={({ field }) => (
+						<Select
+							placeholder="Приоритет"
+							items={PRIORITIES}
+							selected={field.value}
+							onSelect={field.onChange}
+						/>
+					)}
 				/>
 			</Field>
 		</form>

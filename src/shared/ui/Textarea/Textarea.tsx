@@ -1,6 +1,6 @@
 import styles from './Textarea.module.css'
 
-type TextareaProps = React.ComponentPropsWithoutRef<'textarea'>
+type TextareaProps = React.ComponentPropsWithRef<'textarea'>
 
 function Textarea({ ...rest }: TextareaProps) {
 	return (
