@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Priority, Status, Todo, TodoFormData } from './types'
-import { sortItems, useDebouncedValue, type SortState } from '../../../shared/lib'
+import { useDebouncedValue, type SortState } from '../../../shared/lib'
 import { todoApi, todoKeys } from '../../../api/todoApi'
 
 type UseTodoListProps = {
@@ -24,6 +24,7 @@ export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProp
 		statuses: [...statuses].sort(),
 		priorities: [...priorities].sort(),
 		createdAt: [...createdAt].sort(),
+		sort: sort ?? undefined,
 	}
 
 	const todosQuery = useQuery({
@@ -42,11 +43,6 @@ export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProp
 		mutationFn: (id: string) => todoApi.delete(id),
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: todoKeys.all }),
 	})
-
-	const sortedTodos = useMemo(
-		() => sortItems(todosQuery.data ?? [], sort),
-		[todosQuery.data, sort],
-	)
 
 	async function saveTodo(id: string | undefined, data: TodoFormData): Promise<void> {
 		setActionError(null)
@@ -68,7 +64,7 @@ export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProp
 	}
 
 	return {
-		todos: sortedTodos,
+		todos: todosQuery.data ?? [],
 		search,
 		setSearch,
 		sort,

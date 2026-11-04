@@ -1,5 +1,6 @@
-import type { Priority, Status, Todo } from '../features/todo/model/types'
+import type { Priority, Status, Todo, TodoSortField } from '../features/todo/model/types'
 import { todoSchema } from '../features/todo/model/schema'
+import type { SortState } from '../shared/lib'
 import { api } from './client'
 
 type GetTodosParams = {
@@ -7,13 +8,26 @@ type GetTodosParams = {
 	statuses?: Status[]
 	priorities?: Priority[]
 	createdAt?: string[]
+	sort?: SortState<Todo>
 }
 
-/**
- * Ключи кэша TanStack Query.
- * `all` — префикс всех запросов списка (для инвалидации),
- * `list` — конкретный набор фильтров.
- */
+const SORTABLE_FIELDS = ['title', 'createdAt'] as const satisfies readonly TodoSortField[]
+
+function isSortableField(field: keyof Todo): field is TodoSortField {
+	return (SORTABLE_FIELDS as readonly string[]).includes(field)
+}
+
+function buildSortParam(sort: SortState<Todo>): string | null {
+	if (!isSortableField(sort.field)) {
+		return null
+	}
+
+	const prefix = sort.direction === 'desc' ? '-' : ''
+	const tiebreaker = sort.field === 'createdAt' ? '' : ',-createdAt'
+
+	return `${prefix}${sort.field}${tiebreaker}`
+}
+
 export const todoKeys = {
 	all: ['todos'] as const,
 	list: (params: GetTodosParams) => [...todoKeys.all, 'list', params] as const,
@@ -51,6 +65,14 @@ export const todoApi = {
 
 		if (Object.keys(where).length > 0) {
 			searchParams.append('_where', JSON.stringify(where))
+		}
+
+		if (params?.sort) {
+			const sortParam = buildSortParam(params.sort)
+
+			if (sortParam) {
+				searchParams.append('_sort', sortParam)
+			}
 		}
 
 		const query = searchParams.toString()

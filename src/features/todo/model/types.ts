@@ -6,3 +6,4 @@ export type Priority = z.infer<typeof prioritySchema>
 export type TodoFormInput = z.input<typeof todoFormSchema>
 export type TodoFormData = z.output<typeof todoFormSchema>
 export type Todo = z.infer<typeof todoSchema>
+export type TodoSortField = 'title' | 'createdAt'
