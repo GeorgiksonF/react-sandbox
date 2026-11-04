@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Priority, Status, Todo, TodoFormData } from './types'
-import { sortItems, type SortState } from '../../../shared/lib'
-import { todoApi } from '../../../api/todoApi'
+import { sortItems, useDebouncedValue, type SortState } from '../../../shared/lib'
+import { todoApi, todoKeys } from '../../../api/todoApi'
 
 type UseTodoListProps = {
 	statuses: Status[]
@@ -10,67 +11,68 @@ type UseTodoListProps = {
 }
 
 export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProps) {
+	const queryClient = useQueryClient()
 	const [search, setSearch] = useState('')
-	const [todos, setTodos] = useState<Todo[]>([])
 	const [sort, setSort] = useState<SortState<Todo> | null>(null)
+	const [actionError, setActionError] = useState<string | null>(null)
+
 	const normalizedSearch = search.trim()
-	const sortedTodos = useMemo(() => sortItems(todos, sort), [todos, sort])
+	const debouncedSearch = useDebouncedValue(normalizedSearch, normalizedSearch ? 400 : 0)
 
-	useEffect(() => {
-		const controller = new AbortController()
+	const params = {
+		search: debouncedSearch || undefined,
+		statuses: [...statuses].sort(),
+		priorities: [...priorities].sort(),
+		createdAt: [...createdAt].sort(),
+	}
 
-		const fetchTodos = async () => {
-			try {
-				const res = await todoApi.getAll(
-					{
-						search: normalizedSearch || undefined,
-						priorities,
-						statuses,
-						createdAt,
-					},
-					controller.signal,
-				)
-				setTodos(res)
-			} catch (error) {
-				console.error(error)
-			}
-		}
+	const todosQuery = useQuery({
+		queryKey: todoKeys.list(params),
+		queryFn: ({ signal }) => todoApi.getAll(params, signal),
+		placeholderData: keepPreviousData,
+	})
 
-		const timer = setTimeout(async () => fetchTodos(), normalizedSearch ? 400 : 0)
+	const saveMutation = useMutation({
+		mutationFn: (todo: Todo | Omit<Todo, 'id'>) =>
+			'id' in todo ? todoApi.update(todo) : todoApi.create(todo),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: todoKeys.all }),
+	})
 
-		return () => {
-			controller.abort()
-			clearTimeout(timer)
-		}
-	}, [normalizedSearch, statuses, priorities, createdAt])
+	const deleteMutation = useMutation({
+		mutationFn: (id: string) => todoApi.delete(id),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: todoKeys.all }),
+	})
 
-	async function saveTodo(id: string | undefined, data: TodoFormData) {
-		if (id) {
-			const current = todos.find(t => t.id === id)
-			const updated: Todo = {
-				id,
-				createdAt: current?.createdAt ?? new Date().toISOString(),
-				...data,
-			}
+	const sortedTodos = useMemo(
+		() => sortItems(todosQuery.data ?? [], sort),
+		[todosQuery.data, sort],
+	)
 
-			await todoApi.update(updated)
-			setTodos(prev => prev.map(t => (t.id === updated.id ? updated : t)))
-		} else {
-			const created: Todo = {
-				...data,
-				createdAt: new Date().toISOString(),
-				id: crypto.randomUUID(),
-			}
+	async function saveTodo(id: string | undefined, data: TodoFormData): Promise<boolean> {
+		setActionError(null)
 
-			await todoApi.create(created)
-			setTodos(prev => [...prev, created])
+		try {
+			const current = todosQuery.data?.find(todo => todo.id === id)
+			const createdAt = current?.createdAt ?? new Date().toISOString()
+
+			await saveMutation.mutateAsync(id ? { id, createdAt, ...data } : { ...data, createdAt })
+			return true
+		} catch (err) {
+			setActionError(err instanceof Error ? err.message : 'Не удалось сохранить задачу')
+			return false
 		}
 	}
 
 	async function deleteTodo(id: string) {
-		await todoApi.delete(id)
-		setTodos(prev => prev.filter(todo => todo.id !== id))
+		setActionError(null)
+
+		try {
+			await deleteMutation.mutateAsync(id)
+		} catch (err) {
+			setActionError(err instanceof Error ? err.message : 'Не удалось удалить задачу')
+		}
 	}
+
 	return {
 		todos: sortedTodos,
 		search,
@@ -79,5 +81,7 @@ export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProp
 		setSort,
 		saveTodo,
 		deleteTodo,
+		isLoading: todosQuery.isPending,
+		error: todosQuery.error?.message ?? actionError,
 	}
 }

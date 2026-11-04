@@ -24,5 +24,14 @@
 }
 
 .secondary {
-	background-color: var(--seconary);
+	background-color: var(--surface-primary-hover);
+	color: var(--text-color-primary);
+}
+
+.secondary:hover {
+	background-color: color-mix(
+		in srgb,
+		var(--surface-primary-hover),
+		var(--text-color-primary) 8%
+	);
 }

@@ -21,3 +21,16 @@
 .table {
 	margin-top: 16px;
 }
+
+.error {
+	margin-top: 16px;
+	padding: 8px 12px;
+	border-radius: var(--border-radius-s);
+	color: var(--color-error);
+	background-color: color-mix(in srgb, var(--color-error), var(--secondary) 88%);
+}
+
+.status {
+	margin-top: 16px;
+	color: var(--text-color-disabled);
+}

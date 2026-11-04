@@ -45,10 +45,6 @@ function Table<T>({
 			isValidElement(child) && child.type === Column,
 	)
 
-	if (data.length === 0) {
-		return <div>{emptyText}</div>
-	}
-
 	return (
 		<table className={`${styles.table} ${className}`}>
 			<thead>
@@ -82,7 +78,9 @@ function Table<T>({
 											}`}
 											aria-hidden="true"
 										>
-											{getSortIcon(isActive ? (sort?.direction ?? null) : null)}
+											{getSortIcon(
+												isActive ? (sort?.direction ?? null) : null,
+											)}
 										</span>
 									</button>
 								) : (
@@ -94,23 +92,31 @@ function Table<T>({
 				</tr>
 			</thead>
 			<tbody>
-				{data.map((row, rowIndex) => (
-					<tr key={rowKey(row, rowIndex)} className={styles.tr}>
-						{columns.map((col, index) => {
-							const { id, field, render } = col.props
-							const columnKey = id || (field ? String(field) : `col-${index}`)
-							return (
-								<td key={columnKey} className={styles.td}>
-									{render
-										? render(row, rowIndex)
-										: field
-											? String(row[field] ?? '')
-											: ''}
-								</td>
-							)
-						})}
+				{data.length === 0 ? (
+					<tr>
+						<td className={styles.td} colSpan={Math.max(columns.length, 1)}>
+							{emptyText}
+						</td>
 					</tr>
-				))}
+				) : (
+					data.map((row, rowIndex) => (
+						<tr key={rowKey(row, rowIndex)} className={styles.tr}>
+							{columns.map((col, index) => {
+								const { id, field, render } = col.props
+								const columnKey = id || (field ? String(field) : `col-${index}`)
+								return (
+									<td key={columnKey} className={styles.td}>
+										{render
+											? render(row, rowIndex)
+											: field
+												? String(row[field] ?? '')
+												: ''}
+									</td>
+								)
+							})}
+						</tr>
+					))
+				)}
 			</tbody>
 		</table>
 	)

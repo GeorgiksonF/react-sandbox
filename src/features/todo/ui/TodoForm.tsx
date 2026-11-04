@@ -16,21 +16,29 @@ function TodoForm({ todo, formId, onSave }: Props) {
 	const [description, setDescription] = useState(todo?.description ?? '')
 	const [status, setStatus] = useState(todo?.status ?? null)
 	const [priority, setPriority] = useState(todo?.priority ?? null)
+	const [error, setError] = useState('')
 
 	function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
 		e.preventDefault()
-		if (priority && status) {
-			onSave({
-				title,
-				description,
-				status,
-				priority,
-			})
+
+		const normalizedTitle = title.trim()
+
+		if (!normalizedTitle || !status || !priority) {
+			setError('Заполните название, статус и приоритет')
+			return
 		}
+
+		setError('')
+		onSave({
+			title: normalizedTitle,
+			description: description.trim(),
+			status,
+			priority,
+		})
 	}
 	return (
-		<form className={styles.form} id={formId} onSubmit={handleSubmit}>
-			<Input placeholder="Названиe" value={title} onChange={e => setTitle(e.target.value)} />
+		<form className={styles.form} id={formId} onSubmit={handleSubmit} noValidate>
+			<Input placeholder="Название" value={title} onChange={e => setTitle(e.target.value)} />
 			<Textarea
 				placeholder="Описание"
 				value={description}
@@ -43,6 +51,11 @@ function TodoForm({ todo, formId, onSave }: Props) {
 				selected={priority}
 				onSelect={setPriority}
 			/>
+			{error && (
+				<p className={styles.error} role="alert">
+					{error}
+				</p>
+			)}
 		</form>
 	)
 }

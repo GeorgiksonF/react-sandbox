@@ -7,8 +7,19 @@ type GetTodosParams = {
 	priorities?: Priority[]
 	createdAt?: string[]
 }
+
+/**
+ * Ключи кэша TanStack Query.
+ * `all` — префикс всех запросов списка (для инвалидации),
+ * `list` — конкретный набор фильтров.
+ */
+export const todoKeys = {
+	all: ['todos'] as const,
+	list: (params: GetTodosParams) => [...todoKeys.all, 'list', params] as const,
+}
+
 export const todoApi = {
-	create: (todo: Todo) => api.post<Todo>('/todos', todo),
+	create: (todo: Omit<Todo, 'id'>) => api.post<Todo>('/todos', todo),
 	update: (todo: Todo) => api.patch<Todo>(`/todos/${todo.id}`, todo),
 	getAll: (params?: GetTodosParams, signal?: AbortSignal) => {
 		const searchParams = new URLSearchParams()
@@ -41,7 +52,6 @@ export const todoApi = {
 			searchParams.append('_where', JSON.stringify(where))
 		}
 
-		console.log(searchParams.values)
 		const query = searchParams.toString()
 		return api.get<Todo[]>(`/todos${query ? `?${query}` : ''}`, signal)
 	},

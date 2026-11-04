@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3000'
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 type HttpMethods = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -28,7 +28,11 @@ async function request<TResponse>(endpoint: string, options: RequestOptions): Pr
 	const response = await fetch(url, config)
 
 	if (!response.ok) {
-		const errData = response.json().catch(() => ({}))
+		const errData = (await response.json().catch(() => null)) as {
+			message?: string
+			error?: string
+		} | null
+
 		throw new Error(
 			(errData as { message?: string }).message ?? `Ошибка запроса: ${response.status}`,
 		)
