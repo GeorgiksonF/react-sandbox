@@ -48,13 +48,13 @@ E2E/юнит-тестов нет.
 ## 3. Структура
 
 ```
-db.json                     # «база»: { todos: Todo[] }, 14 демо-записей
+db.json                     # «база»: { todos: Todo[] }, 13 демо-записей
 vite.config.ts              # только плагин react
 eslint.config.js            # flat config, см. §7
 src/
-  main.tsx                  # QueryClientProvider → StrictMode → BrowserRouter → RoutesConfig + App
+  main.tsx                  # StrictMode → ErrorBoundary → QueryClientProvider → BrowserRouter → RoutesConfig + App
   App.tsx                   # только <Outlet /> (layout-заглушка)
-  RoutesConfig.tsx          # таблица маршрутов: `/` → redirect, `/todo-list` → TodoPage
+  RoutesConfig.tsx          # маршруты: `/` → redirect, `/todo-list` → TodoPage, `*` → NotFoundPage
   index.css                 # CSS-переменные (цвета, радиусы, тени, размеры шрифта)
   api/
     client.ts               # fetch-обёртка: get/post/put/patch/delete
@@ -69,40 +69,43 @@ src/
       ui/
         TodoList.tsx        # контейнер страницы: поиск, фильтры, таблица, модалка
         TodoTable.tsx       # описание колонок для shared/Table + Dropdown с действиями
-        TodoForm.tsx        # управляемая форма (title, description, status, priority)
+        TodoForm.tsx        # RHF-форма (title, description, status, priority)
         TodoEditModal.tsx   # Modal + TodoForm + кнопки футера
         *.module.css
   pages/
     todo/TodoPage.tsx       # рендерит <TodoList />
+    not-found/NotFoundPage.tsx # 404 + ссылка на /todo-list
   shared/
     index.tsx               # баррель: export * from './ui'; export * from './lib'
     lib/
       index.ts              # баррель lib
       date.ts               # formatDate → dd.mm.yyyy
-      sort.ts               # SortState, sortItems, getNextSort
+      sort.ts               # SortState, getNextSort
       useToggleList.ts      # хук мультивыбора (items + toggle)
       useDebouncedValue.ts  # debounce значения (поиск)
     ui/
       index.tsx             # баррель UI-компонентов
       Button, Input, Textarea, Select, MultiSelect,
-      Table, Dropdown, Modal (+useModal), DatePicker, DatePickerRange
+      Table, Dropdown, Modal (+useModal), DatePicker, DatePickerRange,
+      ErrorBoundary
 ```
 
-> Расхождение с `AGENTS.md`: барреля `src/pages/index.ts` в проекте **нет**,
-> `TodoPage` импортируется в `RoutesConfig` напрямую. Баррели есть только у
-> `shared` и `features`.
+> Баррели есть у `shared` и `features`; `src/pages/index.ts` отсутствует —
+> страницы импортируются в `RoutesConfig` напрямую.
 
 ---
 
 ## 4. Точка входа и маршрутизация
 
-`src/main.tsx` рендерит **два сиблинга** внутри `BrowserRouter`:
-`<RoutesConfig />` (объявление маршрутов) и `<App />` (просто `<Outlet />`).
-Маршрут объявлен без вложенности, поэтому `App` фактически ничего не оборачивает —
-общий layout нужно добавлять через вложенные `Route`/`element`.
+`src/main.tsx` рендерит `<ErrorBoundary>` → `<QueryClientProvider>` →
+`<BrowserRouter>`, внутри которого два сиблинга: `<RoutesConfig />`
+(объявление маршрутов) и `<App />` (просто `<Outlet />`). `ErrorBoundary`
+ловит ошибки рендера и показывает fallback с кнопкой перезагрузки.
+Маршруты объявлены без вложенности, поэтому `App` фактически ничего не
+оборачивает — общий layout нужно добавлять через вложенные `Route`/`element`.
 
-Сейчас: `/` редиректит на `/todo-list` → `TodoPage` → `TodoList`; других
-маршрутов и навигации нет.
+Сейчас: `/` редиректит на `/todo-list` → `TodoPage` → `TodoList`; неизвестный
+путь рендерит `NotFoundPage` (маршрут `*`).
 
 Добавление страницы: файл в `src/pages/...` + запись в `src/RoutesConfig.tsx`.
 
@@ -119,7 +122,8 @@ src/
 - При `!response.ok` тело читается и достаётся `message` или `error`
   (json-server отдаёт `{ "error": "Not Found" }`); если тела нет —
   `Ошибка запроса: <status> <statusText>`.
-- `api.get<T>(endpoint, signal?)`, `post<T>`, `put<T>`, `patch<T>`, `delete` (→ `null`).
+- `api.get<T>(endpoint, signal?, schema?)`, `post<T>`, `put<T>`, `patch<T>`
+  (все принимают необязательную zod-схему), `delete` (→ `null`).
 
 ### `todoApi` (`src/api/todoApi.ts`)
 
@@ -167,10 +171,13 @@ todoApi.getAll(params, signal)`; отмена запроса — на сторо
     - `useMutation` для сохранения (`POST`/`PATCH`) и удаления; в `onSuccess` —
       `invalidateQueries({ queryKey: todoKeys.all })`, после чего активный
       запрос перезагружается сам.
-    - `saveTodo` возвращает `Promise<boolean>` (модалка закрывается только при
-      успехе), `actionError` показывается баннером вместе с `todosQuery.error`.
-    - `sort` — клиентский (`sortItems` в `useMemo`), поэтому сортировка
-      сохраняется при перезапросах.
+    - `saveTodo(data, todo?)` возвращает `Promise<void>`; для редактирования
+      принимает исходный `Todo` из `editModal.data` и сохраняет его `createdAt`,
+      поэтому дата создания не зависит от текущего отфильтрованного списка.
+      Модалка закрывается только при успехе; `actionError` показывается баннером
+      вместе с `todosQuery.error`.
+    - `sort` уходит на сервер вместе с фильтрами (`_sort`), клиентской
+      пересортировки нет.
     - Настройки кэша по умолчанию (в `main.tsx`): `staleTime: 30_000`,
       `retry: 1`.
 
@@ -187,12 +194,12 @@ useState<string[]>() ─────┘
 (`title`, `status`, `priority`, `createdAt`, `actions`), сортировка по
 `title` и `createdAt`, действия — `Dropdown` с пунктами «Редактировать»/«Удалить».
 
-`TodoForm` — не `<form>`-библиотека: локальный `useState` на каждое поле,
-сабмит через `formId` (кнопка в футере `Modal` имеет `form={FORM_ID}`).
-Перед `onSave` выполняется проверка: `title` после `trim()` не пустой,
-выбраны `status` и `priority`; иначе под полями показывается сообщение.
-`saveTodo` возвращает `false` при ошибке, и модалка не закрывается —
-введённые данные не теряются.
+`TodoForm` построен на `react-hook-form` + `zodResolver(todoFormSchema)`.
+`TodoEditModal` создаёт форму через `useTodoForm`, оборачивает её в
+`FormProvider`, а кнопка сабмита находится в футере `Modal` (`type="submit"`,
+форма передаётся через `formProps`). Валидация: `title` после `trim()` не пустой,
+выбраны `status` и `priority`. Ошибка сервера выводится в `errors.root`;
+модалка не закрывается, введённые данные не теряются.
 
 ---
 
@@ -200,6 +207,8 @@ useState<string[]>() ─────┘
 
 ### TypeScript (`tsconfig.app.json` — сборка падает при нарушении)
 
+- `strict: true`, `noUncheckedIndexedAccess: true` → проверка `null/undefined`
+  и индексации массивов.
 - `verbatimModuleSyntax: true` → типы только через `import type`.
 - `erasableSyntaxOnly: true` → без enum/namespace/parameter properties.
 - `noUnusedLocals`, `noUnusedParameters` → не держать мёртвый код;
@@ -242,12 +251,13 @@ useState<string[]>() ─────┘
 | `Table<T>`                                   | декларативные колонки: `Table.Column<T field title sortable render id>`, пропсы `data`, `rowKey`, `sort`, `onSortChange`, `emptyText`; при пустых данных шапка остаётся, а в `tbody` выводится одна ячейка с `emptyText`; сортировка циклична `asc → desc → null` через `getNextSort` |
 | `Dropdown<T>`                                | кнопка-триггер (`children`) + список `{ key, label, handler }[]`; позиционирование `@floating-ui`, закрытие по клику вне                                                                                                                                                              |
 | `Modal`                                      | портал в `document.body`, `title`, `footer`, `width` (px), закрытие по оверлею, кнопке «x» и `Escape`                                                                                                                                                                                 |
+| `ErrorBoundary`                              | ловит ошибки рендера и показывает fallback с кнопкой перезагрузки                                                                                                                                                                                                                     |
 | `useModal<T>()`                              | `{ isOpen, data, open(data?), close(data?) }`; `data` — контекст модалки (например, редактируемая сущность)                                                                                                                                                                           |
 | `useToggleList<T>()`                         | `{ items, toggle }` — мультивыбор для фильтров                                                                                                                                                                                                                                        |
 | `DatePicker`                                 | одиночная дата, значение в ISO `YYYY-MM-DD`, маска ввода `ДД.ММ.ГГГГ`, календарь, «Очистить»/«Сегодня», поддержка controlled/uncontrolled                                                                                                                                             |
 | `DatePickerRange`                            | диапазон `string[]` (0–2 ISO-даты, нормализуются и сортируются), подсветка диапазона, hover-превью                                                                                                                                                                                    |
 | `formatDate`                                 | ISO/Date → `dd.mm.yyyy` (локально; `YYYY-MM-DD` трактуется как календарная дата)                                                                                                                                                                                                      |
-| `sortItems` / `getNextSort` / `SortState<T>` | сравнение чисел, булевых, строк (`localeCompare` c `ru`, `numeric`, `sensitivity: 'base'`); `null` = без сортировки                                                                                                                                                                   |
+| `getNextSort` / `SortState<T>`               | цикл сортировки `asc → desc → null`; сервер получает поле и направление через `_sort`                                                                                                                                                                                                 |
 
 Импорт: `import { Table, Modal, useModal, formatDate } from '../../../shared'`.
 
@@ -262,8 +272,8 @@ useState<string[]>() ─────┘
 
 1. **`StrictMode` в dev** монтирует компоненты дважды, но TanStack Query
    дедуплицирует одинаковые запросы, поэтому лишних сетевых вызовов нет.
-2. **Сортировка и фильтрация разделены**: фильтры — на сервере, сортировка —
-   на клиенте поверх уже отфильтрованного массива.
+2. **Сортировка и фильтрация — на сервере**: `_where` + `_sort`; клиент хранит
+   только `SortState` и передаёт его в параметры/ключ запроса.
 3. **Нет пагинации** и виртуализации: список задач грузится целиком.
 4. **Нет навигации/меню** — единственная страница доступна по `/todo-list`,
    `/` редиректит туда.
@@ -273,8 +283,9 @@ useState<string[]>() ─────┘
    только после `invalidateQueries` + повторного GET.
 7. **Кэш живёт 30 секунд** (`staleTime`): изменения с другого клиента не
    подтянутся, пока данные не устареют или не сработает refetch по фокусу.
-8. **Devtools не подключены** — при отладке кэша можно добавить
-   `@tanstack/react-query-devtools`.
+8. **Devtools подключены** — `ReactQueryDevtools` в `main.tsx`.
+9. **404 и ErrorBoundary**: неизвестный маршрут рендерит `NotFoundPage`,
+   ошибки рендера ловит `ErrorBoundary`.
 
 ---
 

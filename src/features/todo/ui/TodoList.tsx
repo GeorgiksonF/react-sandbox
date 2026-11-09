@@ -27,8 +27,8 @@ function TodoList() {
 			createdAt: createdAtFilter,
 		})
 
-	async function saveEditTodo(todo: TodoFormData) {
-		await saveTodo(editModal.data?.id, todo)
+	async function saveEditTodo(data: TodoFormData) {
+		await saveTodo(data, editModal.data)
 		editModal.close()
 	}
 	async function closeEditTodo() {

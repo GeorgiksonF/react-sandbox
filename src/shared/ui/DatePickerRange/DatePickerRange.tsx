@@ -212,9 +212,10 @@ function DatePickerRange({
 
 	function selectDate(date: Date) {
 		const iso = isoFromDate(date)
+		const [firstDate] = currentDates
 
-		if (currentDates.length === 1) {
-			const nextRange = normalizeRange([currentDates[0], iso])
+		if (firstDate && currentDates.length === 1) {
+			const nextRange = normalizeRange([firstDate, iso])
 
 			if (!sameRange(nextRange, currentDates)) commit(nextRange)
 

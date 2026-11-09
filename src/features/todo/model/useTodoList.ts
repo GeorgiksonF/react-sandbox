@@ -44,13 +44,12 @@ export function useTodoList({ statuses, priorities, createdAt }: UseTodoListProp
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: todoKeys.all }),
 	})
 
-	async function saveTodo(id: string | undefined, data: TodoFormData): Promise<void> {
+	async function saveTodo(data: TodoFormData, todo?: Todo | null): Promise<void> {
 		setActionError(null)
 
-		const current = todosQuery.data?.find(todo => todo.id === id)
-		const createdAt = current?.createdAt ?? new Date().toISOString()
+		const createdAt = todo?.createdAt ?? new Date().toISOString()
 
-		await saveMutation.mutateAsync(id ? { id, createdAt, ...data } : { ...data, createdAt })
+		await saveMutation.mutateAsync(todo ? { ...todo, ...data } : { ...data, createdAt })
 	}
 
 	async function deleteTodo(id: string) {
