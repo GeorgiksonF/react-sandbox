@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './index.css'
 import App from './App.tsx'
 import RoutesConfig from './RoutesConfig.tsx'
+import { ErrorBoundary } from './shared'
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -18,12 +19,14 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<ReactQueryDevtools initialIsOpen={false} />
-			<BrowserRouter>
-				<RoutesConfig />
-				<App />
-			</BrowserRouter>
-		</QueryClientProvider>
+		<ErrorBoundary>
+			<QueryClientProvider client={queryClient}>
+				<ReactQueryDevtools initialIsOpen={false} />
+				<BrowserRouter>
+					<RoutesConfig />
+					<App />
+				</BrowserRouter>
+			</QueryClientProvider>
+		</ErrorBoundary>
 	</StrictMode>,
 )
